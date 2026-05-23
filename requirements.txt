@@ -1,0 +1,2 @@
+flask>=3.0.0
+# tensorflow>=2.15.0  # Uncomment when connecting real model

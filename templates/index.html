@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PhishGuard AI — интеллектуальная система обнаружения фишинговых URL с использованием нейронных сетей">
+  <title>PhishGuard AI — Phishing Detection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <!-- Animated background -->
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--blue" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--green" aria-hidden="true"></div>
+  <canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="#" class="navbar__logo">
+      <span class="logo-icon">&#9670;</span>
+      PhishGuard<span class="accent">AI</span>
+    </a>
+    <button class="navbar__toggle" id="nav-toggle" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="navbar__links" id="nav-links">
+      <li><a href="#hero">Главная</a></li>
+      <li><a href="#features">Анализ</a></li>
+      <li><a href="#about">О фишинге</a></li>
+      <li><a href="#architecture">Архитектура</a></li>
+      <li><a href="#models">ML Модели</a></li>
+      <li><a href="#tips">Безопасность</a></li>
+    </ul>
+  </nav>
+
+  <!-- 1. Hero Section -->
+  <section id="hero" class="hero">
+    <div class="hero__content">
+      <div class="hero__badge">Neural Network Powered</div>
+      <h1 class="hero__title">
+        <span class="title-line">PhishGuard</span>
+        <span class="title-accent">AI</span>
+      </h1>
+      <p class="hero__subtitle">
+        Интеллектуальная система анализа URL-адресов для обнаружения фишинговых сайтов
+      </p>
+
+      <div class="scan-box glass">
+        <div class="scan-box__header">
+          <span class="scan-dot scan-dot--green"></span>
+          <span class="scan-dot scan-dot--yellow"></span>
+          <span class="scan-dot scan-dot--red"></span>
+          <span class="scan-box__label">URL Scanner v2.0</span>
+        </div>
+        <div class="scan-box__body">
+          <input
+            type="url"
+            id="url-input"
+            class="scan-input"
+            placeholder="https://example.com/suspicious-page"
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <button type="button" id="scan-btn" class="btn btn--primary">
+            <span class="btn__text">Проверить URL</span>
+            <span class="btn__loader" hidden></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="hero__stats">
+        <div class="stat-pill"><span class="stat-pill__value">97.13%</span> Accuracy</div>
+        <div class="stat-pill"><span class="stat-pill__value">12ms</span> Inference</div>
+        <div class="stat-pill"><span class="stat-pill__value">11</span> Features</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Result Section -->
+  <section id="result" class="result section" hidden>
+    <div class="container">
+      <h2 class="section__title">Результат анализа</h2>
+      <div class="result__grid">
+        <div class="result-card glass" id="status-card">
+          <div class="result-card__icon" id="status-icon"></div>
+          <div class="result-card__label">Статус</div>
+          <div class="result-card__value" id="status-text">—</div>
+        </div>
+        <div class="result-card glass">
+          <div class="risk-ring" id="risk-ring">
+            <svg viewBox="0 0 120 120">
+              <circle class="risk-ring__bg" cx="60" cy="60" r="52"/>
+              <circle class="risk-ring__fill" id="risk-circle" cx="60" cy="60" r="52"/>
+            </svg>
+            <span class="risk-ring__value" id="risk-value">0%</span>
+          </div>
+          <div class="result-card__label">Уровень риска</div>
+        </div>
+        <div class="result-card glass result-card--wide" id="explanation-card">
+          <div class="result-card__label">Объяснение</div>
+          <p class="explanation-list__hint">Причины оценки риска</p>
+          <ul class="explanation-list" id="explanation-list" role="list"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. URL Feature Analysis -->
+  <section id="features" class="features section">
+    <div class="container">
+      <h2 class="section__title">Анализ признаков URL</h2>
+      <p class="section__subtitle">Извлечённые признаки для нейросетевой классификации</p>
+      <div class="feature-grid" id="feature-grid">
+        <!-- Populated by JS or shown as placeholders -->
+        <div class="feature-card glass" data-feature="url_length">
+          <div class="feature-card__icon">&#128207;</div>
+          <div class="feature-card__name">Длина URL</div>
+          <div class="feature-card__value">—</div>
+        </div>
+        <div class="feature-card glass" data-feature="has_https">
+          <div class="feature-card__icon">&#128274;</div>
+          <div class="feature-card__name">HTTPS</div>
+          <div class="feature-card__value">—</div>
+        </div>
+        <div class="feature-card glass" data-feature="has_ip_address">
+          <div class="feature-card__icon">&#127760;</div>
+          <div class="feature-card__name">IP-адрес</div>
+          <div class="feature-card__value">—</div>
+        </div>
+        <div class="feature-card glass" data-feature="at_symbol">
+          <div class="feature-card__icon">&#64;</div>
+          <div class="feature-card__name">Символ @</div>
+          <div class="feature-card__value">—</div>
+        </div>
+        <div class="feature-card glass" data-feature="dash_count">
+          <div class="feature-card__icon">&#8211;</div>
+          <div class="feature-card__name">Дефисы</div>
+          <div class="feature-card__value">—</div>
+        </div>
+        <div class="feature-card glass" data-feature="dot_count">
+          <div class="feature-card__icon">&#9679;</div>
+          <div class="feature-card__name">Точки</div>
+          <div class="feature-card__value">—</div>
+        </div>
+        <div class="feature-card glass" data-feature="suspicious_word_count">
+          <div class="feature-card__icon">&#9888;</div>
+          <div class="feature-card__name">Подозр. слова</div>
+          <div class="feature-card__value">—</div>
+        </div>
+        <div class="feature-card glass" data-feature="subdomain_count">
+          <div class="feature-card__icon">&#128451;</div>
+          <div class="feature-card__name">Поддомены</div>
+          <div class="feature-card__value">—</div>
+        </div>
+        <div class="feature-card glass" data-feature="is_shortened">
+          <div class="feature-card__icon">&#128279;</div>
+          <div class="feature-card__name">Сокращатель</div>
+          <div class="feature-card__value">—</div>
+        </div>
+        <div class="feature-card glass" data-feature="special_char_count">
+          <div class="feature-card__icon">&#10033;</div>
+          <div class="feature-card__name">Спецсимволы</div>
+          <div class="feature-card__value">—</div>
+        </div>
+        <div class="feature-card glass" data-feature="digit_count">
+          <div class="feature-card__icon">#</div>
+          <div class="feature-card__name">Цифры</div>
+          <div class="feature-card__value">—</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. About Phishing -->
+  <section id="about" class="about section">
+    <div class="container">
+      <h2 class="section__title">О фишинге</h2>
+      <p class="section__subtitle">Основные виды социальной инженерии в цифровой среде</p>
+      <div class="about-grid">
+        <article class="about-card glass">
+          <div class="about-card__icon">&#128373;</div>
+          <h3>Phishing</h3>
+          <p>Массовая рассылка поддельных писем и ссылок, имитирующих известные бренды для кражи учётных данных.</p>
+        </article>
+        <article class="about-card glass">
+          <div class="about-card__icon">&#9993;</div>
+          <h3>Email Phishing</h3>
+          <p>Фишинг через электронную почту с вредоносными вложениями или ссылками на поддельные страницы входа.</p>
+        </article>
+        <article class="about-card glass">
+          <div class="about-card__icon">&#127919;</div>
+          <h3>Spear Phishing</h3>
+          <p>Целевая атака на конкретного человека или организацию с персонализированным контентом.</p>
+        </article>
+        <article class="about-card glass">
+          <div class="about-card__icon">&#128241;</div>
+          <h3>Smishing</h3>
+          <p>Фишинг через SMS-сообщения с короткими ссылками и призывами срочно подтвердить данные.</p>
+        </article>
+        <article class="about-card glass">
+          <div class="about-card__icon">&#128222;</div>
+          <h3>Vishing</h3>
+          <p>Голосовой фишинг по телефону: злоумышленник выдаёт себя за банк или техподдержку.</p>
+        </article>
+        <article class="about-card glass">
+          <div class="about-card__icon">&#127760;</div>
+          <h3>Pharming</h3>
+          <p>Перенаправление трафика с легитимного домена на поддельный сайт через DNS-отравление.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. System Architecture -->
+  <section id="architecture" class="architecture section">
+    <div class="container">
+      <h2 class="section__title">Архитектура системы</h2>
+      <p class="section__subtitle">Поток обработки URL от пользователя до предсказания</p>
+      <div class="flow-diagram">
+        <div class="flow-node glass">
+          <div class="flow-node__icon">&#128100;</div>
+          <span>User</span>
+        </div>
+        <div class="flow-arrow">&#8595;</div>
+        <div class="flow-node glass">
+          <div class="flow-node__icon">&#128187;</div>
+          <span>Frontend</span>
+        </div>
+        <div class="flow-arrow">&#8595;</div>
+        <div class="flow-node glass flow-node--highlight">
+          <div class="flow-node__icon">&#9881;</div>
+          <span>Flask API</span>
+        </div>
+        <div class="flow-arrow">&#8595;</div>
+        <div class="flow-node glass">
+          <div class="flow-node__icon">&#128300;</div>
+          <span>Feature Extraction</span>
+        </div>
+        <div class="flow-arrow">&#8595;</div>
+        <div class="flow-node glass flow-node--nn">
+          <div class="flow-node__icon">&#129504;</div>
+          <span>Neural Network</span>
+        </div>
+        <div class="flow-arrow">&#8595;</div>
+        <div class="flow-node glass flow-node--result">
+          <div class="flow-node__icon">&#9989;</div>
+          <span>Prediction Result</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. ML Models -->
+  <section id="models" class="models section">
+    <div class="container">
+      <h2 class="section__title">Модели машинного обучения</h2>
+      <p class="section__subtitle">Сравнение baseline и нейросетевой модели</p>
+      <div class="models-grid">
+        <div class="model-card glass">
+          <div class="model-card__header">
+            <h3>Logistic Regression</h3>
+            <span class="model-badge">Baseline</span>
+          </div>
+          <div class="model-metric">
+            <span class="model-metric__label">Accuracy</span>
+            <span class="model-metric__value" data-count="95.3">0</span><span>%</span>
+          </div>
+          <p class="model-card__desc">Классическая линейная модель для быстрого прототипирования и сравнения.</p>
+        </div>
+        <div class="model-card glass model-card--featured">
+          <div class="model-card__glow"></div>
+          <div class="model-card__header">
+            <h3>Neural Network</h3>
+            <span class="model-badge model-badge--primary">Production</span>
+          </div>
+          <div class="model-metrics-grid">
+            <div class="model-metric">
+              <span class="model-metric__label">Accuracy</span>
+              <span class="model-metric__value accent" data-count="97.13">0</span><span>%</span>
+            </div>
+            <div class="model-metric">
+              <span class="model-metric__label">Precision</span>
+              <span class="model-metric__value accent" data-count="97.10">0</span><span>%</span>
+            </div>
+            <div class="model-metric">
+              <span class="model-metric__label">Recall</span>
+              <span class="model-metric__value accent" data-count="97.13">0</span><span>%</span>
+            </div>
+            <div class="model-metric">
+              <span class="model-metric__label">ROC-AUC</span>
+              <span class="model-metric__value accent" data-count="0.9934" data-decimal="4">0</span>
+            </div>
+            <div class="model-metric model-metric--wide">
+              <span class="model-metric__label">Среднее время предсказания</span>
+              <span class="model-metric__value accent">12</span><span> ms</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Security Tips -->
+  <section id="tips" class="tips section">
+    <div class="container">
+      <h2 class="section__title">Советы по безопасности</h2>
+      <div class="tips-grid">
+        <div class="tip-card glass">
+          <span class="tip-card__num">01</span>
+          <p>Не переходите по подозрительным ссылкам из писем и мессенджеров.</p>
+        </div>
+        <div class="tip-card glass">
+          <span class="tip-card__num">02</span>
+          <p>Всегда проверяйте доменное имя в адресной строке браузера.</p>
+        </div>
+        <div class="tip-card glass">
+          <span class="tip-card__num">03</span>
+          <p>Не доверяйте только наличию HTTPS — сертификат не гарантирует легитимность сайта.</p>
+        </div>
+        <div class="tip-card glass">
+          <span class="tip-card__num">04</span>
+          <p>Никогда не передавайте SMS-коды и одноразовые пароли третьим лицам.</p>
+        </div>
+        <div class="tip-card glass">
+          <span class="tip-card__num">05</span>
+          <p>Используйте двухфакторную аутентификацию (2FA) для всех важных аккаунтов.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Footer -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <span class="footer__logo">PhishGuard AI</span>
+        <p class="footer__project">Дипломный проект: «Система автоматического обнаружения фишинговых веб-сайтов с использованием нейронных сетей»</p>
+      </div>
+      <div class="footer__meta">
+        <p>Автор: <strong>Студент</strong></p>
+        <p>&copy; 2026</p>
+      </div>
+      <div class="footer__links">
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="footer__link">GitHub</a>
+        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="footer__link">LinkedIn</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
